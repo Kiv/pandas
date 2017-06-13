@@ -1896,8 +1896,13 @@ void Object_beginTypeContext(JSOBJ _obj, JSONTypeContext *tc) {
         return;
     } else if (PyArray_IsScalar(obj, Float) || PyArray_IsScalar(obj, Double)) {
         PRINTMARK();
-        pc->PyTypeToJSON = NpyFloatToDOUBLE;
-        tc->type = JT_DOUBLE;
+        PyArray_CastScalarToCtype(obj, &val, PyArray_DescrFromType(NPY_DOUBLE));
+        if (npy_isnan(val) || npy_isinf(val)) {
+            tc->type = JT_NULL;
+        } else {
+            pc->PyTypeToJSON = NpyFloatToDOUBLE;
+            tc->type = JT_DOUBLE;
+        }
         return;
     } else if (PyArray_Check(obj) && PyArray_CheckScalar(obj)) {
         tmpObj = PyObject_Repr(obj);

@@ -27,7 +27,7 @@ json_unicode = (json.dumps if compat.PY3
                 else partial(json.dumps, encoding="utf-8"))
 
 
-class UltraJSONTests(object):
+class TestUltraJSON(object):
 
     @pytest.mark.skipif(compat.is_platform_32bit(),
                         reason="not compliant on 32-bit, xref #15865")
@@ -480,6 +480,18 @@ class UltraJSONTests(object):
 
     def test_encodeDoubleNan(self):
         input = np.nan
+        assert ujson.encode(input) == 'null', "Expected null"
+
+    def test_encodeFloat32Nan(self):
+        input = np.float32('NaN')
+        assert ujson.encode(input) == 'null', "Expected null"
+
+    def test_encodeFloat32Inf(self):
+        input = np.float32('inf')
+        assert ujson.encode(input) == 'null', "Expected null"
+
+    def test_encodeFloat32NegInf(self):
+        input = np.float32('-inf')
         assert ujson.encode(input) == 'null', "Expected null"
 
     def test_encodeDoubleInf(self):
@@ -944,7 +956,7 @@ class UltraJSONTests(object):
                 ujson.decode(ujson.encode(l, default_handler=str)))
 
 
-class NumpyJSONTests(object):
+class TestNumpyJSON(object):
 
     def testBool(self):
         b = np.bool(True)
@@ -1220,7 +1232,7 @@ class NumpyJSONTests(object):
         assert (np.array(['a', 'b']) == output[2]).all()
 
 
-class PandasJSONTests(object):
+class TestPandasJSON(object):
 
     def testDataFrame(self):
         df = DataFrame([[1, 2, 3], [4, 5, 6]], index=[
